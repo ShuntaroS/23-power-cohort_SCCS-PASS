@@ -1,9 +1,9 @@
 library(tidyverse)
 library(scales)
-# remotes::install_github("idmn/ggview")
+remotes::install_github("idmn/ggview", force = TRUE)
 library(ggview)
 
-res_sim2 <- read_rds("03_Output/result_cohort_yymmdd.rds")
+res_sim2 <- read_rds("03_Output/result_cohort_230720.rds")
 
 df_cohort_power <- res_sim2 %>%
   select(-no, -result) %>%
@@ -13,21 +13,21 @@ df_cohort_power <- res_sim2 %>%
                                                     "Risk ratio: 1.5",
                                                     "Risk ratio: 2",
                                                     "Risk ratio: 5")),
-         prevalence = factor(prevalence, labels = c("Prevalence of unvaccined:\n 1/100,000",
-                                                    "Prevalence of unvaccined:\n 5/100,000",
-                                                    "Prevalence of unvaccined:\n 10/100,000",
-                                                    "Prevalence of unvaccined:\n 50/100,000",
-                                                    "Prevalence of unvaccined:\n 100/100,000")))
+         prevalence = factor(prevalence, labels = c("Prevalence of unvaccinated:\n 1/100,000",
+                                                    "Prevalence of unvaccinated:\n 5/100,000",
+                                                    "Prevalence of unvaccinated:\n 10/100,000",
+                                                    "Prevalence of unvaccinated:\n 50/100,000",
+                                                    "Prevalence of unvaccinated:\n 100/100,000")))
 
 fig_cohort_power <- ggplot(df_cohort_power, aes(x = n1, y = power, color = ratio, shape = ratio, group = ratio)) +
   geom_point() +
   geom_line() +
   theme_bw() +
   facet_grid(risk_ratio ~ prevalence) +
-  xlab("Sample size of vaccined") +
+  xlab("Sample size of vaccinated") +
   ylab("Power (%)") +
-  labs(color = "Ratio of vaccined to unvaccined",
-       shape = "Ratio of vaccined to unvaccined") +
+  labs(color = "Ratio of vaccinated to unvaccinated",
+       shape = "Ratio of vaccinated to unvaccinated") +
   scale_x_continuous(breaks = c(100000, 500000, 1000000, 2000000, 3000000, 4000000, 5000000, 8000000, 10000000),
                      labels = number_format()) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1),
@@ -35,15 +35,16 @@ fig_cohort_power <- ggplot(df_cohort_power, aes(x = n1, y = power, color = ratio
         panel.grid.minor = element_blank())
 
 fig_cohort_power
-ggview(width = 9, height = 9*0.68)
-ggsave("03_Output/fig_cohort_yymmdd.pdf", width = 9, height = 9*0.68)
-ggsave("03_Output/fig_cohort_yymmdd.eps", width = 9, height = 9*0.68)
+ggview(width = 10, height = 10*0.68)
+ggsave("03_Output/fig_cohort_230728.pdf", width = 10, height = 10*0.68)
+ggsave("03_Output/fig_cohort_230728.eps", width = 9, height = 9*0.68)
 
 
-res_sccs_sim2 <- read_rds("03_Output/res_sccs_yymmdd.rds")
+res_sccs_sim2 <- read_rds("03_Output/res_sccs_230720.rds")
 
 df_sccs_power <- res_sccs_sim2 %>%
   select(-no, -result) %>%
+  # filter(n1 %in% c(100000, 500000, 1000000, 2000000, 3000000, 4000000, 5000000, 8000000, 10000000)) %>%
   filter(obserbed_age <= 75) %>%
   mutate(obserbed_age = factor(obserbed_age, labels = c("1 yr",
                                                         "2 yrs",
@@ -75,8 +76,8 @@ fig_sccs_power_rp14 <- df_sccs_power %>%
 
 fig_sccs_power_rp14
 ggview(width = 8, height = 8*0.68)
-ggsave("03_Output/fig_sccs_power_rp14_yymmdd.pdf", width = 8, height = 8*0.68)
-ggsave("03_Output/fig_sccs_power_rp14_yymmdd.eps", width = 8, height = 8*0.68)
+ggsave("03_Output/fig_sccs_power_rp14_230722.pdf", width = 8, height = 8*0.68)
+ggsave("03_Output/fig_sccs_power_rp14_230722.eps", width = 8, height = 8*0.68)
 
 fig_sccs_power_rp30 <- df_sccs_power %>% 
   filter(risk_period == "Risk period: 30 days") %>% 
@@ -95,8 +96,8 @@ fig_sccs_power_rp30 <- df_sccs_power %>%
 
 fig_sccs_power_rp30
 ggview(width = 8, height = 8*0.68)
-ggsave("03_Output/fig_sccs_power_rp30_yymmdd.pdf", width = 8, height = 8*0.68)
-ggsave("03_Output/fig_sccs_power_rp30_yymmdd.eps", width = 8, height = 8*0.68)
+ggsave("03_Output/fig_sccs_power_rp30_230722.pdf", width = 8, height = 8*0.68)
+ggsave("03_Output/fig_sccs_power_rp30_230722.eps", width = 8, height = 8*0.68)
 
 fig_sccs_power_rp42 <- df_sccs_power %>% 
   filter(risk_period == "Risk period: 42 days") %>% 
@@ -115,6 +116,6 @@ fig_sccs_power_rp42 <- df_sccs_power %>%
 
 fig_sccs_power_rp42
 ggview(width = 8, height = 8*0.68)
-ggsave("03_Output/fig_sccs_power_rp42_yymmdd.pdf", width = 8, height = 8*0.68)
-ggsave("03_Output/fig_sccs_power_rp42_yymmdd.eps", width = 8, height = 8*0.68)
+ggsave("03_Output/fig_sccs_power_rp42_230722.pdf", width = 8, height = 8*0.68)
+ggsave("03_Output/fig_sccs_power_rp42_230722.eps", width = 8, height = 8*0.68)
 
