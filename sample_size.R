@@ -35,7 +35,7 @@ sample_size_fisher <- function(data){
   res_p
 }
 
-iteration <- 1000
+iteration <- 5000
 prevalence <- c(1/100000, 5/100000, 10/100000, 50/100000, 100/100000)
 risk_ratio <- c(1.2, 1.5, 2, 5)
 n1 <- c(100000, 500000, 1000000, 2000000, 3000000, 4000000, 5000000)
@@ -55,8 +55,37 @@ res_sim2 <- res_sim %>%
   mutate(power = map_dbl(result, ~ (100*sum(.x < 0.05)/iteration))) %>% 
   unnest(data)
 
-write_rds(res_sim2, "03_Output/result_cohort_yymmdd.rds")
-
+write_rds(res_sim2, "03_Output/result_cohort_231110.rds")
+# res_sim2 <- read_rds("03_Output/result_cohort_230720.rds")
+# 
+# df_cohort_power <- res_sim2 %>% 
+#   select(-no, -result) %>% 
+#   filter(n1 %in% c(100000, 500000, 1000000, 2000000, 3000000, 4000000, 5000000, 8000000, 10000000)) %>% 
+#   mutate(ratio = factor(ratio),
+#          risk_ratio = factor(risk_ratio, labels = c("Risk ratio: 1.2", 
+#                                                     "Risk ratio: 1.5",
+#                                                     "Risk ratio: 2",
+#                                                     "Risk ratio: 5")),
+#          prevalence = factor(prevalence, labels = c("Prevalence: 0.7/100,000 (GBS)",
+#                                                     "Prevalence: 9.5/100,000 (ITP)")))
+# 
+# fig_cohort_power <- ggplot(df_cohort_power, aes(x = n1, y = power, color = ratio, shape = ratio, group = ratio)) +
+#   geom_point() +
+#   geom_line() +
+#   theme_bw() +
+#   facet_grid(risk_ratio ~ prevalence) +
+#   xlab("No. of exposured") +
+#   ylab("Power (%)") +
+#   labs(color = "No. of unexposured / no. of exposured",
+#        shape = "No. of unexposured / no. of exposured") +
+#   scale_x_continuous(breaks = c(100000, 500000, 1000000, 2000000, 3000000, 4000000, 5000000, 8000000, 10000000),
+#                      labels = number_format()) +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1),
+#         legend.position = "bottom",
+#         panel.grid.minor = element_blank())
+#   
+# fig_cohort_power
+# ggsave("03_Output/fig_cohort.pdf", width = 8, height = 8*0.68)
 
 # Sample size of SCCS design ----------------------------------------------
 
@@ -102,12 +131,12 @@ sample_size_sccs<- function(data){
 
 }
 
-iteration <- 1000
+iteration <- 5000
 rate_ratio <- c(1.2, 1.5, 2, 5)
-n <- c(seq(10, 100, by = 5), seq(200, 500, by = 100))
+n <- c(seq(10, 300, by = 10))
 # n <- c(seq(10, 100, by = 2))
 risk_period <- c(14, 30, 42)
-obserbed_age <- c(66, 67, 68, 70, 75)
+obserbed_age <- c(66, 68, 70, 75)
 
 set.seed(5678)
 sccs_sim <- expand_grid(rate_ratio, n, risk_period, obserbed_age)　%>%
@@ -121,4 +150,39 @@ res_sccs_sim2 <- res_sccs_sim %>%
   mutate(power = map_dbl(result, ~ (100*sum(.x < 0.05)/iteration))) %>% 
   unnest(data)
 
-write_rds(res_sccs_sim2, "03_Output/res_sccs_yymmdd.rds")
+write_rds(res_sccs_sim2, "03_Output/res_sccs_231120.rds")
+# res_sccs_sim2 <- read_rds("03_Output/res_sccs_230720.rds")
+# 
+# df_sccs_power <- res_sccs_sim2 %>% 
+#   select(-no, -result) %>% 
+#   # filter(n1 %in% c(100000, 500000, 1000000, 2000000, 3000000, 4000000, 5000000, 8000000, 10000000)) %>% 
+#   filter(obserbed_age <= 75) %>% 
+#   mutate(obserbed_age = factor(obserbed_age, labels = c("1 yr",
+#                                                         "2 yrs",
+#                                                         "3 yrs",
+#                                                         "5 yrs",
+#                                                         "10 yrs")),
+#          risk_period = factor(risk_period),
+#          rate_ratio = factor(rate_ratio, labels = c("Rate ratio: 1.2", 
+#                                                     "Rate ratio: 1.5",
+#                                                     "Rate ratio: 2",
+#                                                     "Rate ratio: 5")))
+# 
+# fig_sccs_power <- ggplot(df_sccs_power, aes(x = n, y = power)) +
+#   geom_point(size = 0.5) +
+#   geom_line() +
+#   theme_bw() +
+#   facet_grid(rate_ratio ~ obserbed_age) +
+#   xlab("No. of event") +
+#   ylab("Power (%)") +
+#   # labs(color = "No. of unexposured / no. of exposured",
+#   #      shape = "No. of unexposured / no. of exposured") +
+#   # scale_x_continuous(breaks = c(100000, 500000, 1000000, 2000000, 3000000, 4000000, 5000000, 8000000, 10000000),
+#   #                    labels = number_format()) +
+#   scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100)) +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1),
+#         legend.position = "bottom",
+#         panel.grid.minor = element_blank())
+# 
+# fig_sccs_power
+# ggsave("03_Output/fig_sccs.pdf", width = 8, height = 8*0.68)
